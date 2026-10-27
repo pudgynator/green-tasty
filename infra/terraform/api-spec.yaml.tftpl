@@ -2115,6 +2115,138 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
               method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+  /guest/groups/{groupReservationId}/sessions:
+    parameters:
+      - name: groupReservationId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      security:
+        - cognito_authorizer: []
+      responses:
+        '200':
+          description: Lambda proxy response
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: "${lambda_invoke_arn}"
+        passthroughBehavior: when_no_match
+    options:
+      responses:
+        '200':
+          description: CORS preflight
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: when_no_match
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+  /reservations/{reservationId}/guest-session-id:
+    parameters:
+      - name: reservationId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      security:
+        - cognito_authorizer: []
+      responses:
+        '200':
+          description: Lambda proxy response
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: "${lambda_invoke_arn}"
+        passthroughBehavior: when_no_match
+    options:
+      responses:
+        '200':
+          description: CORS preflight
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: when_no_match
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization'"
+  /group-reservations/{groupReservationId}/submit:
+    parameters:
+      - name: groupReservationId
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      security:
+        - cognito_authorizer: []
+      responses:
+        '200':
+          description: Lambda proxy response
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST
+        uri: "${lambda_invoke_arn}"
+        passthroughBehavior: when_no_match
+    options:
+      responses:
+        '200':
+          description: CORS preflight
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        passthroughBehavior: when_no_match
+        responses:
+          default:
+            statusCode: '200'
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,Authorization'"
   /reservations/{reservationId}/invite-token:
     parameters:
       - name: reservationId
