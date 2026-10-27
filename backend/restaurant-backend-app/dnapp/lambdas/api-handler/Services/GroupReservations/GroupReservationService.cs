@@ -10,6 +10,7 @@ using APIHandler.Repositories.Tables;
 using APIHandler.Services.Auth;
 using APIHandler.Services.Locations;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace APIHandler.Services.GroupReservations;
@@ -82,7 +83,33 @@ public class GroupReservationService(
         };
 
         await groupReservationRepository.SaveGroupReservationAsync(groupReservation);
+        await EnsureOwnerSessionAsync(groupReservation);
         return groupReservation;
+    }
+
+    private async Task EnsureOwnerSessionAsync(GroupReservation groupReservation)
+    {
+        var reservation = await reservationRepository.GetReservationByIdAsync(groupReservation.ReservationId);
+        if (string.IsNullOrWhiteSpace(reservation?.CustomerId))
+        {
+            return;
+        }
+
+        var sessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservation.GroupReservationId) ?? [];
+        if (sessions.Any(session => session.IsOwnerSession))
+        {
+            return;
+        }
+
+        await guestSessionRepository.SaveAsync(new GuestSession
+        {
+            Id = Guid.NewGuid().ToString(),
+            GroupReservationId = groupReservation.GroupReservationId,
+            GuestName = "Owner",
+            Dishes = [],
+            IsOwnerSession = true,
+            OwnerUserId = reservation.CustomerId,
+        });
     }
 
     public async Task CreateGroupReservationIfDoesNotExistAsync(string userId, string reservationId)
