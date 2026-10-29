@@ -1,0 +1,162 @@
+@use 'app/shared/styles/abstracts/colors' as color;
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px 12px;
+  background: color.$neutral-0;
+  border: 1px solid color.$neutral-200;
+  border-radius: 16px;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.submitted {
+  color: color.$green-800;
+  background: color.$green-100;
+}
+
+.pending {
+  color: color.$orange-600;
+  background: color.$orange-100;
+}
+
+.remove {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: color.$neutral-900;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid color.$orange-400;
+    outline-offset: 2px;
+  }
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid color.$neutral-100;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color.$green-100;
+  color: color.$green-600;
+  font-weight: 600;
+}
+
+.name {
+  margin: 0;
+  min-width: 0;
+  font-weight: 500;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+
+.weight {
+  display: block;
+  color: color.$neutral-600;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+.qty,
+.price {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.price {
+  font-weight: 500;
+  text-align: right;
+}
+
+.empty {
+  margin: 0;
+  color: color.$neutral-600;
+}
+
+.subtotal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid color.$green-150;
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 14px 14px 10px;
+  }
+
+  .item {
+    gap: 8px;
+  }
+}
