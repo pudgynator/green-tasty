@@ -6,10 +6,13 @@ import { MainCoverImageComponent } from '@app/shared/custom-components/main-cove
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { DishSort } from '@app/models/enums/dish-sort.model';
 import { DishType } from '@app/models/enums/dish-type.model';
-import { DishSortingLabels, DishTypeLabels } from '@app/shared/mappers/dish-enum.mapper';
+import { DishTypeLabels } from '@app/shared/mappers/dish-enum.mapper';
 import { DishModalComponent } from '@app/components/dish-modal/dish-modal.component';
 import { PreOrdersService } from '@app/services/pre-orders/pre-orders.service';
 import {ToastService} from '@app/services/toast/toast.service';
+import { ReservationService } from '@app/services/reservation/reservation.service';
+import { AuthenticationService } from '@app/auth/services/authentication.service';
+import { Reservation, ReservationStatus } from '@app/models/reservations/reservation.model';
 
 @Component({
   selector: 'app-menu-page',
@@ -34,8 +37,11 @@ export class MenuPageComponent implements OnInit {
   preOrderReservationId?: string;
   preOrderReservationLabel?: string;
 
-  sortOptions = Object.values(DishSort);
-  sortLabels = DishSortingLabels;
+  readonly sortChoices: { value: DishSort; label: string }[] = [
+    { value: DishSort.PopularityDescending, label: 'Recommended' },
+    { value: DishSort.PriceAscending, label: 'Price: Low to high' },
+    { value: DishSort.PriceDescending, label: 'Price: High to low' },
+  ];
 
   menuCategories = Object.values(DishType);
   menuCategoryLabels = DishTypeLabels;
@@ -47,12 +53,16 @@ export class MenuPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private  readonly orderService = inject(PreOrdersService);
+  private readonly reservationService = inject(ReservationService);
+  private readonly auth = inject(AuthenticationService);
+  private reservationFromAccount = false;
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       const preOrder = params['preOrder'];
-      this.isPreOrderEnabled = !!preOrder;
-      if (this.isPreOrderEnabled) {
+      if (preOrder) {
+        this.reservationFromAccount = false;
+        this.isPreOrderEnabled = true;
         this.preOrderReservationId = params['reservationId'];
         this.preOrderReservationLabel = params['reservationLabel'];
         if (!this.preOrderReservationId) {
@@ -60,6 +70,8 @@ export class MenuPageComponent implements OnInit {
           this.toast.error('Pre-order is enabled but no reservation ID provided.', 'Error');
           this.isPreOrderEnabled = false;
         }
+      } else if (!this.reservationFromAccount) {
+        this.isPreOrderEnabled = false;
       }
 
       const category = params['category'] as DishType;
@@ -70,8 +82,47 @@ export class MenuPageComponent implements OnInit {
       this.selectedSort =
         sort && Object.values(DishSort).includes(sort) ? sort : DishSort.PopularityDescending;
 
+      if (!preOrder && !this.reservationFromAccount) {
+        this.attachUpcomingReservation();
+      }
+
       this.loadDishes();
     });
+  }
+
+  private attachUpcomingReservation(): void {
+    if (!this.auth.getToken()) {
+      return;
+    }
+
+    this.reservationService.getReservationsForUser$().subscribe({
+      next: (reservations) => {
+        const upcoming = reservations
+          .filter((reservation) => this.isUpcoming(reservation))
+          .sort((left, right) => new Date(left.startTime).getTime() - new Date(right.startTime).getTime())[0];
+
+        if (!upcoming) {
+          return;
+        }
+
+        const start = new Date(upcoming.startTime);
+        const end = new Date(upcoming.endTime);
+        this.reservationFromAccount = true;
+        this.isPreOrderEnabled = true;
+        this.preOrderReservationId = upcoming.id;
+        this.preOrderReservationLabel = [
+          upcoming.locationAddress,
+          start.toLocaleDateString(),
+          `${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        ].join(', ');
+      },
+    });
+  }
+
+  private isUpcoming(reservation: Reservation): boolean {
+    const status = reservation.status as unknown as number | string;
+    const cancelled = status === ReservationStatus.Cancelled || status === 'Cancelled';
+    return !cancelled && new Date(reservation.endTime).getTime() > Date.now();
   }
 
   loadDishes(): void {
@@ -97,6 +148,13 @@ export class MenuPageComponent implements OnInit {
 
       this.filteredDishes = this.dishes;
     });
+  }
+
+  selectAll(): void {
+    if (this.selectedCategory === null) {
+      return;
+    }
+    this.onCategorySelected(this.selectedCategory);
   }
 
   onCategorySelected(category: DishType): void {

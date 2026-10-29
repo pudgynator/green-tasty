@@ -37,8 +37,15 @@ export class DishCardComponent {
   });
 
   onCardClicked(): void {
-    if (!this.isUnavailable() && !this.preOrderEnabled()) {
+    if (!this.isUnavailable()) {
       this.dishClicked.emit();
+    }
+  }
+
+  onPreOrderClick(event: Event): void {
+    event.stopPropagation();
+    if (!this.isUnavailable()) {
+      this.preOrderClicked.emit();
     }
   }
 }

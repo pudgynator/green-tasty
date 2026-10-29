@@ -24,4 +24,10 @@
     <span>{{ dish.price }}$</span>
     <span>{{ dish.weight }}</span>
   </div>
+
+  @if (preOrderEnabled) {
+    <app-custom-button type="button" variant="primary" size="large" fullWidth (click)="preOrderClicked.emit()">
+      Pre-Order
+    </app-custom-button>
+  }
 </div>
