@@ -1,0 +1,51 @@
+name: Group pre-order level 2
+
+on:
+  push:
+    paths:
+      - 'aqa/group-preorder/**'
+      - '.github/workflows/aqa-level2.yml'
+  pull_request:
+    paths:
+      - 'aqa/group-preorder/**'
+      - '.github/workflows/aqa-level2.yml'
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aqa/group-preorder
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: aqa/group-preorder/package-lock.json
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Run level 2 tests
+        run: npm test
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          UI_BASE_URL: ${{ secrets.UI_BASE_URL }}
+          OWNER_EMAIL: ${{ secrets.OWNER_EMAIL }}
+          OWNER_PASSWORD: ${{ secrets.OWNER_PASSWORD }}
+          WAITER_EMAIL: ${{ secrets.WAITER_EMAIL }}
+          WAITER_PASSWORD: ${{ secrets.WAITER_PASSWORD }}
+
+      - name: Publish the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            aqa/group-preorder/playwright-report/
+            aqa/group-preorder/test-results/
+          if-no-files-found: ignore

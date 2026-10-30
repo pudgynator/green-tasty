@@ -1,0 +1,18 @@
+{
+  "name": "group-preorder-aqa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Direction 1, level 2: end-to-end tests for consolidated group pre-order confirmation.",
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:ui": "playwright test --project=ui",
+    "test:level2": "playwright test --grep @level2",
+    "report": "playwright show-report playwright-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.6.0",
+    "typescript": "^5.9.2"
+  }
+}
