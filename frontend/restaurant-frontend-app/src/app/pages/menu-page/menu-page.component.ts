@@ -48,6 +48,8 @@ export class MenuPageComponent implements OnInit {
 
   selectedCategory: DishType | null = null; // initially show all
   selectedSort: DishSort = DishSort.PopularityDescending;
+  searchQuery = '';
+  dishesLoaded = false;
 
   private readonly dishesService = inject(DishesService);
   private readonly route = inject(ActivatedRoute);
@@ -128,6 +130,7 @@ export class MenuPageComponent implements OnInit {
   loadDishes(): void {
     const category = this.selectedCategory ?? undefined;
     const sort = this.selectedSort;
+    this.dishesLoaded = false;
 
     this.dishesService.getDishes(category, sort).subscribe((data) => {
       this.dishes = data.map((dish) => ({
@@ -146,8 +149,21 @@ export class MenuPageComponent implements OnInit {
         vitamins: dish.vitamins || '0',
       }));
 
-      this.filteredDishes = this.dishes;
+      this.applySearch();
+      this.dishesLoaded = true;
     });
+  }
+
+  onSearchChanged(event: Event): void {
+    this.searchQuery = (event.target as HTMLInputElement).value;
+    this.applySearch();
+  }
+
+  private applySearch(): void {
+    const query = this.searchQuery.trim().toLowerCase();
+    this.filteredDishes = query
+      ? this.dishes.filter((dish) => dish.name.toLowerCase().includes(query))
+      : this.dishes;
   }
 
   selectAll(): void {

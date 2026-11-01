@@ -91,6 +91,37 @@
   flex-direction: column;
 }
 
+.dish-search {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+
+  span {
+    color: color.$neutral-900;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  input {
+    width: min(100%, 24rem);
+    height: 3rem;
+    padding: 0 1.125rem;
+    border: 1px solid color.$neutral-200;
+    border-radius: 0.5rem;
+    background: color.$neutral-0;
+    color: color.$neutral-900;
+    font: inherit;
+    font-size: 0.875rem;
+  }
+}
+
+.menu-empty {
+  margin: 0 0 1.5rem;
+  color: color.$neutral-900;
+  font-size: 1rem;
+}
+
 .filter-sort-bar {
   display: flex;
   align-items: center;
@@ -175,11 +206,13 @@
     margin: 1rem;
   }
 
-  .filter-sort-bar {
+  .filter-sort-bar,
+  .dish-search {
     align-items: flex-start;
     flex-direction: column;
   }
 
+  .dish-search input,
   .category-buttons,
   .sort-dropdown,
   .sort-dropdown select {

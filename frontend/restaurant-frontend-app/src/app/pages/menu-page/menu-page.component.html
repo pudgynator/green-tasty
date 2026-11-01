@@ -22,6 +22,16 @@
 
     <section class="content-sections">
       <div class="menu-section">
+        <label class="dish-search">
+          <span>Search</span>
+          <input
+            type="search"
+            placeholder="Find a dish"
+            [value]="searchQuery"
+            (input)="onSearchChanged($event)"
+          />
+        </label>
+
         <div class="filter-sort-bar">
           <nav class="category-buttons" aria-label="Dish categories">
             <button type="button" [class.active]="selectedCategory === null" (click)="selectAll()">
@@ -47,6 +57,16 @@
             </select>
           </div>
         </div>
+
+        @if (dishesLoaded && filteredDishes.length === 0) {
+          <p class="menu-empty" role="status">
+            @if (searchQuery.trim()) {
+              No dishes match “{{ searchQuery.trim() }}”.
+            } @else {
+              No dishes in this category.
+            }
+          </p>
+        }
 
         <div class="dish-cards">
           @for (dish of filteredDishes; track dish.id) {
